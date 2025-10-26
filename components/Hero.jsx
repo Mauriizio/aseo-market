@@ -18,7 +18,7 @@ const PHRASES = [
 
 /** Frases MOBILE: comenzamos por el eslogan y luego rotamos */
 const MOBILE_PHRASES = [
-  "Empresa con más de 25 años de experiencia en el rubro.",
+  "Más de 25 años de experiencia.",
   ...PHRASES,
 ];
 
@@ -34,42 +34,30 @@ export default function Hero() {
   className="relative overflow-hidden md:border-b"
   style={{ minHeight: "calc(100svh - 64px)" }}
 >
+  {/* Capa base: “papel” con degradado sutil (desktop y mobile) */}
+  <div
+    aria-hidden
+    className="absolute inset-0 -z-20"
+    style={{ background: "var(--paper-grad)" }}
+  />
 
-      {/* ====== FONDOS ====== */}
-      {/* Desktop: banda roja derecha */}
-      <div
-        aria-hidden
-        className="absolute right-0 top-0 -z-10 hidden md:block"
-        style={{
-          height: "calc(100svh - 64px)",
-          width: "33.333vw",
-          background:
-            "linear-gradient(180deg,var(--brand) 0%, var(--brand-dark) 100%)",
-        }}
-      />
-      {/* Highlight sutil en rojo (desktop) */}
-      <div
-        aria-hidden
-        className="pointer-events-none hidden md:block absolute right-0 inset-y-0 -z-10"
-        style={{
-          width: "33.333vw",
-          background:
-            "radial-gradient(120% 80% at 70% 30%, rgba(255,255,255,.12), rgba(255,255,255,0) 60%)",
-        }}
-      />
-      {/* Vignette sutil en blanco (todo) */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-0 top-0 -z-10"
-        style={{
-          height: "calc(100svh - 64px)",
-          width: "100vw",
-          background:
-            "radial-gradient(80% 60% at 40% 50%, rgba(0,0,0,.04), rgba(0,0,0,0) 60%)",
-        }}
-      />
+  {/* Franja roja (solo desktop): degradado + brillo */}
+  <div
+    aria-hidden
+    className="absolute right-0 top-0 -z-10 hidden md:block"
+    style={{
+      height: "calc(100svh - 64px)",
+      width: "33.333vw",
+      background: "var(--brand-grad)",
+    }}
+  />
+
+
+      
 
       {/* ================= MOBILE (flyer-like) ================ */}
+
+      
       <div className="md:hidden px-5 pt-6 h-full flex flex-col pb-[120px]">
         {/* Dobléz superior derecha: SVG (A) o PNG recortado (B) */}
         {USE_IMAGE_FOLD ? (
@@ -92,15 +80,17 @@ export default function Hero() {
           }`}
         >
           {/* Logo más grande y un poco más abajo */}
-          <div className="mt-10">
-  <Image
-    src="/logo-aseo-market.png"
-    alt="Aseo Market"
-    width={2000}
-    height={600}
-    priority
-    className="mx-auto h-auto w-[98%] max-w-[820px]"
-  />
+          <div className="mt-14 px-2"> 
+  <div className="relative mx-auto w-[96%] max-w-[920px] h-[34svh] max-h-[340px]">
+    <Image
+      src="/logo-aseo-market.png"
+      alt="Aseo Market"
+      fill
+      priority
+      className="object-contain"
+      sizes="(max-width: 768px) 100vw, 50vw"
+    />
+  </div>
 </div>
 
 
@@ -237,13 +227,14 @@ function ContactCell({ icon, label, href }) {
 function MobileTypewriter({ phrases }) {
   return (
     <TypewriterBase
-      phrases={phrases}
-      classNameTitle="text-[20px] font-semibold tracking-wide text-brand uppercase"
-      classNameLine="mt-3 text-[16px] text-gray-800"
-      showStaticTitle={true}
-      staticTitle="Aseo y Mantención Industrial"
-      maxWidth="90%"
-    />
+  phrases={phrases}
+  classNameTitle="text-[24px] font-semibold tracking-wide text-brand uppercase"
+  classNameLine="mt-3 text-[16px] text-gray-800"
+  showStaticTitle={true}
+  staticTitle="Aseo y Mantención Industrial"
+  maxWidth="90%"
+/>
+
   );
 }
 

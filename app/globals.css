@@ -17,3 +17,20 @@ body { background: var(--paper); color: var(--ink); }
 .btn { @apply inline-flex items-center justify-center rounded-lg px-4 py-2 font-medium transition; }
 .btn-brand { @apply btn bg-brand text-white hover:bg-brandDark; }
 .btn-outline { @apply btn border border-neutral-300 hover:bg-neutral-50; }
+
+
+:root{
+  /* rojos corporativos */
+  --brand: #db1d22;
+  --brand-dark: #b11216;
+
+  /* fondo “papel”: degradado vertical + halo radial muy suave */
+  --paper-grad:
+    radial-gradient(120% 80% at 38% 46%, rgba(0,0,0,.05), rgba(0,0,0,0) 60%),
+    linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+
+  /* franja roja: degradado + brillo */
+  --brand-grad:
+    linear-gradient(180deg, var(--brand) 0%, var(--brand-dark) 100%),
+    radial-gradient(120% 80% at 70% 25%, rgba(255,255,255,.12), rgba(255,255,255,0) 60%);
+}
