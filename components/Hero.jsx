@@ -1,150 +1,168 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import CTAButtons from "./CTAButtons";
-import { HERO_ITEMS } from "@/data/heroItems";
+import { motion } from "framer-motion";
 
-/**
- * Requisitos:
- * - /public/logo-aseo-market.png  (logo ancho ~600–800px)
- * - HERO_ITEMS con rutas válidas (jpg/png) en /public/hero/
- */
+/** Frases cortas que rotan sobre la banda roja (desktop) */
+const PHRASES = [
+  "Aseo industrial certificado",
+  "Vidrios en altura",
+  "Mantención de oficinas",
+  "Lavado de alfombras",
+];
 
 export default function Hero() {
-  // índice actual y anterior para crossfade limpio
-  const [idx, setIdx] = useState(0);
-  const [prevIdx, setPrevIdx] = useState(0);
-  const timerRef = useRef(null);
-  const LEN = HERO_ITEMS.length;
-
-  useEffect(() => {
-    // Single interval (robusto frente a StrictMode)
-    clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setPrevIdx((p) => {
-        const next = (idx + 1) % LEN;
-        return idx; // el anterior pasa a ser el actual
-      });
-      setIdx((i) => (i + 1) % LEN);
-    }, 4500);
-
-    return () => clearInterval(timerRef.current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [LEN, idx]);
-
-  const current = HERO_ITEMS[idx];
-  const previous = HERO_ITEMS[prevIdx];
-
   return (
     <section
       className="relative overflow-hidden border-b"
-      style={{ minHeight: "calc(100svh - 64px)" }} // 64px ~ header h-16
+      style={{ minHeight: "calc(100svh - 64px)" }} // 64px ≈ header
     >
-      {/* Geometría roja: superior derecha */}
+      {/* Banda roja vertical */}
       <div
         aria-hidden
-        className="pointer-events-none absolute right-[-15vw] top-[10vh] w-[80vw] h-[70vh] -z-10"
+        className="absolute right-0 top-0 -z-10"
         style={{
-          background:
-            "linear-gradient(180deg,var(--brand) 0%, var(--brand-dark) 100%)",
-          clipPath: "polygon(28% 0, 100% 0, 72% 100%, 0 100%)",
-          boxShadow: "0 28px 90px -30px rgba(226,30,43,.35)",
+          height: "calc(100svh - 64px)",
+          width: "33.333vw",               // 1/3 de ancho (ajusta a 30vw si la quieres más delgada)
+          background: "linear-gradient(180deg,var(--brand) 0%, var(--brand-dark) 100%)",
         }}
       />
-      {/* Geometría roja: inferior izquierda (también visible en mobile) */}
+      {/* Banda roja móvil (un poco más estrecha) */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-[-25vw] bottom-[-10vh] w-[70vw] h-[35vh] -z-10"
+        className="absolute right-0 top-0 -z-10 md:hidden"
         style={{
-          background:
-            "linear-gradient(180deg,var(--brand-dark) 0%, var(--brand) 100%)",
-          clipPath: "polygon(0 0, 65% 0, 100% 100%, 0 100%)",
-          boxShadow: "0 -20px 80px -40px rgba(226,30,43,.25)",
+          height: "calc(100svh - 64px)",
+          width: "42vw",
+          background: "linear-gradient(180deg,var(--brand) 0%, var(--brand-dark) 100%)",
         }}
       />
 
-      <div className="container h-full py-10 md:py-16 grid md:grid-cols-2 gap-10 items-center">
-        {/* IZQUIERDA: LOGO grande + copy + CTAs (sin título adicional) */}
-        <div className="relative flex flex-col justify-center">
-          {/* Logo visible en mobile y desktop */}
-          <div className="mb-6">
+      <div className="mx-auto max-w-7xl px-4 h-full grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+        {/* IZQUIERDA: Logo + eslogan + CTAs */}
+        <div className="flex flex-col justify-center py-8 md:py-10">
+          <motion.div initial={{opacity:0, y:8}} animate={{opacity:1, y:0, transition:{duration:.45}}}>
             <Image
               src="/logo-aseo-market.png"
               alt="Aseo Market"
-              width={720}           // ↑ 50% más grande
-              height={220}
+              width={1200}
+              height={340}
               priority
-              className="w-auto h-auto max-w-[90%] md:max-w-[720px]"
+              className="w-[94%] md:w-[96%] h-auto mx-auto md:mx-0"
             />
-          </div>
+          </motion.div>
 
-          <p className="text-gray-700 max-w-xl">
+          <motion.p
+            initial={{opacity:0, y:8}}
+            animate={{opacity:1, y:0, transition:{duration:.45, delay:.05}}}
+            className="text-gray-700 max-w-xl mt-4 md:mt-6"
+          >
             15+ años de experiencia. Protocolos claros y respuesta rápida.
-            Cotiza hoy y programa una visita técnica.
-          </p>
+          </motion.p>
 
-          <div className="mt-6">
-            <CTAButtons />
-          </div>
+          <motion.div
+            initial={{opacity:0, y:8}}
+            animate={{opacity:1, y:0, transition:{duration:.45, delay:.1}}}
+            className="mt-4 flex flex-wrap gap-3"
+          >
+            <a href="#contacto" className="btn bg-brand text-white hover:bg-brandDark">
+              Agendar visita
+            </a>
+            <a href="tel:+56923927777" className="btn border border-neutral-300 hover:bg-neutral-50">
+              Llamar
+            </a>
+          </motion.div>
         </div>
 
-        {/* DERECHA: SLIDER (crossfade 2 capas: prev → current) */}
-        <div className="relative h-[42vh] md:h-[70vh] rounded-2xl overflow-hidden shadow-soft bg-neutral-100">
-          {/* Preload silencioso (evita flashes al primer cambio) */}
-          {HERO_ITEMS.map((it) => (
-            <Image
-              key={`pre-${it.id}`}
-              src={it.img}
-              alt=""
-              width={1}
-              height={1}
-              priority
-              className="hidden"
-            />
-          ))}
-
-          {/* Capa anterior (se desvanece) */}
-          <FadeImage
-            key={`prev-${previous.id}-${prevIdx}`}
-            src={previous.img}
-            title={previous.title}
-            subtitle={previous.subtitle}
-            show={true}
-            opacity={0} // destino
-          />
-          {/* Capa actual (aparece) */}
-          <FadeImage
-            key={`curr-${current.id}-${idx}`}
-            src={current.img}
-            title={current.title}
-            subtitle={current.subtitle}
-            show={true}
-            opacity={1} // destino
-          />
+        {/* DERECHA: Desktop → typewriter; Mobile → oculto */}
+        <div className="hidden md:flex h-full items-center justify-center">
+          <TypewriterPanel phrases={PHRASES} />
         </div>
       </div>
     </section>
   );
 }
 
-function FadeImage({ src, title, subtitle, opacity }) {
+/** Panel sobre la banda roja con typewriter limpio y sin parpadeos */
+function TypewriterPanel({ phrases, typingSpeed = 45, holdTime = 1300, eraseSpeed = 35 }) {
+  const [pi, setPi] = useState(0);        // índice de frase
+  const [txt, setTxt] = useState("");     // texto visible
+  const [mode, setMode] = useState("type"); // "type" | "hold" | "erase"
+  const raf = useRef(null);
+  const tRef = useRef(0);
+
+  useEffect(() => {
+    let last = performance.now();
+
+    const step = (now) => {
+      const dt = now - last;
+      last = now;
+
+      // respeta usuarios que prefieren menos movimiento
+      const prefersReduced = typeof window !== "undefined" &&
+        window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      if (prefersReduced) {
+        // solo muestra la primera frase estática
+        setTxt(phrases[0]);
+        cancelAnimationFrame(raf.current);
+        return;
+      }
+
+      if (mode === "type") {
+        tRef.current += dt;
+        if (tRef.current >= typingSpeed) {
+          tRef.current = 0;
+          const full = phrases[pi];
+          const nextLen = txt.length + 1;
+          const next = full.slice(0, nextLen);
+          setTxt(next);
+          if (nextLen >= full.length) {
+            setMode("hold");
+            tRef.current = 0;
+          }
+        }
+      } else if (mode === "hold") {
+        tRef.current += dt;
+        if (tRef.current >= holdTime) {
+          setMode("erase");
+          tRef.current = 0;
+        }
+      } else if (mode === "erase") {
+        tRef.current += dt;
+        if (tRef.current >= eraseSpeed) {
+          tRef.current = 0;
+          const next = txt.slice(0, -1);
+          setTxt(next);
+          if (next.length === 0) {
+            setMode("type");
+            setPi((i) => (i + 1) % phrases.length);
+          }
+        }
+      }
+
+      raf.current = requestAnimationFrame(step);
+    };
+
+    raf.current = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, pi, txt, phrases]);
+
   return (
-    <div
-      className="absolute inset-0 will-change-opacity transition-opacity duration-700 ease-in-out"
-      style={{ opacity }}
-    >
-      <Image
-        src={src}
-        alt={title}
-        fill
-        sizes="(min-width: 768px) 45vw, 95vw"
-        priority
-        className="object-cover"
-      />
-      <div className="absolute inset-0 bg-gradient-to-tr from-black/30 via-black/10 to-transparent" />
-      <div className="absolute bottom-0 left-0 p-5 text-white drop-shadow">
-        <h3 className="text-lg md:text-xl font-semibold">{title}</h3>
-        <p className="text-white/90">{subtitle}</p>
+    <div className="w-full pr-[4vw]">
+      <div className="text-white">
+        <h2 className="font-serif text-4xl lg:text-5xl font-bold drop-shadow">
+          Aseo y Mantención Industrial
+        </h2>
+
+        <div className="mt-5 text-2xl lg:text-3xl font-semibold tracking-tight flex items-center gap-2">
+          <span className="inline-block min-h-[1.8rem] lg:min-h-[2rem]">
+            {txt}
+          </span>
+          {/* cursor */}
+          <span className="w-[2px] h-[1.6rem] lg:h-[1.9rem] bg-white animate-pulse" />
+        </div>
       </div>
     </div>
   );
