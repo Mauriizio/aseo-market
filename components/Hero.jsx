@@ -16,17 +16,27 @@ const PHRASES = [
   "Limpieza y desinfeccion",
 ];
 
+/** Frases MOBILE: comenzamos por el eslogan y luego rotamos */
+const MOBILE_PHRASES = [
+  "Empresa con más de 25 años de experiencia en el rubro.",
+  ...PHRASES,
+];
+
+/** cambia a true si prefieres pegar una imagen recortada del flyer */
+const USE_IMAGE_FOLD = true; // <- si pones true, agrega /public/mobile/fold.png
+
 export default function Hero() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
   return (
     <section
-      className="relative overflow-hidden border-b"
-      style={{ minHeight: "calc(100svh - 64px)" }}
-    >
-      {/* ====== BANDAS / FONDOS ====== */}
-      {/* Rojo desktop (1/3) */}
+  className="relative overflow-hidden md:border-b"
+  style={{ minHeight: "calc(100svh - 64px)" }}
+>
+
+      {/* ====== FONDOS ====== */}
+      {/* Desktop: banda roja derecha */}
       <div
         aria-hidden
         className="absolute right-0 top-0 -z-10 hidden md:block"
@@ -37,7 +47,7 @@ export default function Hero() {
             "linear-gradient(180deg,var(--brand) 0%, var(--brand-dark) 100%)",
         }}
       />
-      {/* Highlight radial sobre rojo (desktop) */}
+      {/* Highlight sutil en rojo (desktop) */}
       <div
         aria-hidden
         className="pointer-events-none hidden md:block absolute right-0 inset-y-0 -z-10"
@@ -47,8 +57,6 @@ export default function Hero() {
             "radial-gradient(120% 80% at 70% 30%, rgba(255,255,255,.12), rgba(255,255,255,0) 60%)",
         }}
       />
-      {/* (IMPORTANTE) Quitamos la banda roja vertical en mobile */}
-
       {/* Vignette sutil en blanco (todo) */}
       <div
         aria-hidden
@@ -61,20 +69,21 @@ export default function Hero() {
         }}
       />
 
-      {/* ====== MOBILE HERO (flyer-like) ====== */}
-      <div className="md:hidden px-5 pt-6 h-full flex flex-col">
-        {/* Esquina doblada superior derecha */}
-        <div className="absolute right-0 top-0 w-[55vw] h-[30vw]">
-          <svg viewBox="0 0 100 60" className="w-full h-full">
-            <defs>
-              <linearGradient id="fold" x1="0" x2="1" y1="0" y2="1">
-                <stop offset="0%" stopColor="var(--brand-dark)" />
-                <stop offset="100%" stopColor="var(--brand)" />
-              </linearGradient>
-            </defs>
-            <path d="M100,0 L100,60 C65,40 35,25 0,0 Z" fill="url(#fold)" />
-          </svg>
-        </div>
+      {/* ================= MOBILE (flyer-like) ================ */}
+      <div className="md:hidden px-5 pt-6 h-full flex flex-col pb-[120px]">
+        {/* Dobléz superior derecha: SVG (A) o PNG recortado (B) */}
+        {USE_IMAGE_FOLD ? (
+          <Image
+            src="/mobile/fold.png"  // sube aquí el recorte del flyer
+            alt=""
+            width={600}
+            height={320}
+            priority
+            className="absolute right-0 top-0 w-[58vw] h-auto pointer-events-none select-none"
+          />
+        ) : (
+          <FoldSvg />
+        )}
 
         {/* Contenido principal mobile */}
         <div
@@ -82,23 +91,26 @@ export default function Hero() {
             mounted ? "opacity-100" : "opacity-0"
           }`}
         >
-          <Image
-            src="/logo-aseo-market.png"
-            alt="Aseo Market"
-            width={1400}
-            height={420}
-            priority
-            className="mx-auto h-auto w-[88%] max-w-[680px]"
-          />
+          {/* Logo más grande y un poco más abajo */}
+          <div className="mt-10">
+  <Image
+    src="/logo-aseo-market.png"
+    alt="Aseo Market"
+    width={2000}
+    height={600}
+    priority
+    className="mx-auto h-auto w-[98%] max-w-[820px]"
+  />
+</div>
 
-          <h1 className="mt-6 text-[17px] font-semibold tracking-wide text-brand uppercase">
-            Aseo y Mantención Industrial
-          </h1>
-          <p className="mt-2 text-gray-700">
-            Empresa con más de 25 años de experiencia en el rubro.
-          </p>
 
-          <div className="mt-5 flex flex-col gap-3 items-center">
+          {/* Typewriter en mobile (sustituye eslogan estático) */}
+          <div className="mt-12">
+            <MobileTypewriter phrases={MOBILE_PHRASES} />
+          </div>
+
+          {/* CTAs centrados */}
+          <div className="mt-6 flex flex-col gap-3 items-center">
             <a
               href="#contacto"
               className="btn w-[88%] bg-brand text-white hover:bg-brandDark"
@@ -114,18 +126,17 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Franja inferior con datos e íconos (solo mobile) */}
-        <MobileContactStrip />
+        {/* Footer del Hero (rojo) en grid 2×2 */}
+        <MobileHeroFooter />
       </div>
 
-      {/* ====== DESKTOP HERO (columna blanca centrada) ====== */}
+      {/* ================= DESKTOP (SIN CAMBIOS) ================ */}
       <div className="hidden md:grid mx-auto max-w-7xl px-4 h-full grid-cols-2 items-center">
         <div
           className={`flex flex-col justify-center items-center text-center gap-5 transition-opacity duration-500 ${
             mounted ? "opacity-100" : "opacity-0"
           }`}
         >
-          {/* Logo más grande con leve scale */}
           <div className="md:scale-[1.15] origin-center">
             <Image
               src="/logo-aseo-market.png"
@@ -155,38 +166,49 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* ====== TYPEWRITER SOLO ESCRITORIO ====== */}
+      {/* Typewriter escritorio centrado en la banda roja */}
       <div className="hidden md:block absolute inset-y-0 right-0 w-[33.333vw] z-10">
         <div className="grid place-items-center w-full px-[3vw] h-full">
-          <TypewriterPanel phrases={PHRASES} centered />
+          <DesktopTypewriter phrases={PHRASES} />
         </div>
       </div>
     </section>
   );
 }
 
-/* ---------- Tira de contacto inferior (mobile) ---------- */
-function MobileContactStrip() {
+/* ============ COMPONENTES MOBILE =============== */
+
+/** Footer rojo 2×2 como en el flyer */
+function MobileHeroFooter() {
   return (
-    <div className="mt-auto pb-5">
-      <div className="mx-[-20px] pt-4 pb-5 px-5 bg-brand text-white rounded-t-2xl shadow-[0_-6px_20px_rgba(0,0,0,.08)]">
-        <div className="grid grid-cols-1 gap-3 text-[13px]">
-          <ContactRow
+    <div
+      className="absolute left-0 right-0 bottom-0 z-20"
+      // respeta notch en iOS y no pisa el sistema:
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+    >
+      <div className="w-full pt-4 pb-5 px-5 bg-brand text-white rounded-none border-t border-white/15">
+
+        {/* GRID 2×2 como en el flyer */}
+        <div className="grid grid-cols-2 gap-3 text-[10px]">
+          <ContactCell
             icon={<Phone className="w-4 h-4" />}
             label="+56 9 9555 42422"
             href="tel:+56995542422"
           />
-          <ContactRow
-            icon={<MapPin className="w-4 h-4" />}
-            label="Los Militares 5620 Of. 905"
-            href="https://maps.google.com/?q=Los%20Militares%205620%20Of.%20905"
-          />
-          <ContactRow
+        {/* derecha fila 1 */}
+          <ContactCell
             icon={<Globe className="w-4 h-4" />}
             label="aseomarket.com"
             href="https://aseomarket.com"
           />
-          <ContactRow
+        {/* izquierda fila 2 */}
+          <ContactCell
+            icon={<MapPin className="w-4 h-4" />}
+            label="Los Militares 5620 Of. 905"
+            href="https://maps.google.com/?q=Los%20Militares%205620%20Of.%20905"
+          />
+        {/* derecha fila 2 */}
+          <ContactCell
             icon={<Mail className="w-4 h-4" />}
             label="aseomarketspa@gmail.com"
             href="mailto:aseomarketspa@gmail.com"
@@ -197,7 +219,8 @@ function MobileContactStrip() {
   );
 }
 
-function ContactRow({ icon, label, href }) {
+
+function ContactCell({ icon, label, href }) {
   return (
     <a
       href={href}
@@ -210,17 +233,71 @@ function ContactRow({ icon, label, href }) {
   );
 }
 
-/* ---------- Typewriter rojo (desktop) ---------- */
-function TypewriterPanel({
+/** Typewriter mobile */
+function MobileTypewriter({ phrases }) {
+  return (
+    <TypewriterBase
+      phrases={phrases}
+      classNameTitle="text-[20px] font-semibold tracking-wide text-brand uppercase"
+      classNameLine="mt-3 text-[16px] text-gray-800"
+      showStaticTitle={true}
+      staticTitle="Aseo y Mantención Industrial"
+      maxWidth="90%"
+    />
+  );
+}
+
+/** Dobléz superior (SVG escalable) */
+function FoldSvg() {
+  return (
+    <svg viewBox="0 0 100 60" className="absolute right-0 top-0 w-[58vw] h-auto">
+      <defs>
+        <linearGradient id="foldGrad" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0%" stopColor="var(--brand-dark)" />
+          <stop offset="100%" stopColor="var(--brand)" />
+        </linearGradient>
+        <radialGradient id="foldSh" cx="65%" cy="25%" r="60%">
+          <stop offset="0%" stopColor="rgba(0,0,0,.25)" />
+          <stop offset="100%" stopColor="rgba(0,0,0,0)" />
+        </radialGradient>
+      </defs>
+      {/* capa principal */}
+      <path d="M100,0 L100,60 C65,40 35,25 0,0 Z" fill="url(#foldGrad)" />
+      {/* sombra interior sutil para simular papel doblado */}
+      <path d="M100,0 L100,60 C65,40 35,25 0,0 Z" fill="url(#foldSh)" opacity=".18" />
+    </svg>
+  );
+}
+
+/* ============ TYPEWRITER BASE (reutilizable) ============= */
+
+function DesktopTypewriter({ phrases }) {
+  return (
+    <TypewriterBase
+      phrases={phrases}
+      classNameTitle="font-serif text-5xl xl:text-6xl font-bold text-white text-center"
+      classNameLine="mt-5 text-2xl xl:text-3xl font-semibold tracking-tight text-white text-center"
+      showStaticTitle={true}
+      staticTitle="Aseo y Mantención Industrial"
+      maxWidth="28vw"
+    />
+  );
+}
+
+function TypewriterBase({
   phrases,
   typingSpeed = 45,
   holdTime = 1300,
   eraseSpeed = 35,
-  centered = false,
+  showStaticTitle = false,
+  staticTitle = "",
+  classNameTitle = "",
+  classNameLine = "",
+  maxWidth = "100%",
 }) {
   const [pi, setPi] = useState(0);
   const [txt, setTxt] = useState("");
-  const [mode, setMode] = useState("type");
+  const [mode, setMode] = useState("type"); // "type" | "hold" | "erase"
   const raf = useRef(null);
   const tRef = useRef(0);
 
@@ -267,6 +344,7 @@ function TypewriterPanel({
           }
         }
       }
+
       raf.current = requestAnimationFrame(step);
     };
 
@@ -276,19 +354,13 @@ function TypewriterPanel({
   }, [mode, pi, txt, phrases]);
 
   return (
-    <div
-      className={`text-white drop-shadow w-full max-w-[28vw] ${
-        centered ? "text-center" : ""
-      }`}
-    >
-      <h2 className="font-serif text-5xl xl:text-6xl font-bold">
-        Aseo y Mantención Industrial
-      </h2>
-      <div className="mt-5 text-2xl xl:text-3xl font-semibold tracking-tight flex items-center gap-2 justify-center">
-        <span className="inline-block min-h-[2rem] xl:min-h-[2.2rem]">
-          {txt}
-        </span>
-        <span className="w-[2px] h-[1.9rem] xl:h-[2.2rem] bg-white animate-pulse" />
+    <div className="w-full" style={{ maxWidth, margin: "0 auto" }}>
+      {showStaticTitle && (
+        <h2 className={classNameTitle}>{staticTitle}</h2>
+      )}
+      <div className={`${classNameLine} flex items-center gap-2 justify-center`}>
+        <span className="inline-block min-h-[1.9rem]">{txt}</span>
+        <span className="w-[2px] h-[1.7rem] bg-current animate-pulse" />
       </div>
     </div>
   );
